@@ -1,4 +1,4 @@
-#Library_Management_System
+#Library_Management_Web_Application
 
 ![image alt](https://github.com/Rajiv-mandal04/LM_system/blob/main/Screenshot%202025-09-09%20150623.png)
 
