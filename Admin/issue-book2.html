@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Issue Book</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #74ebd5, #acb6e5);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .main-wrapper {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .left-panel,
+    .right-panel {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      flex: 1 1 500px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #2d3436;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      width: 60px;
+      height: 4px;
+      background: #0984e3;
+      position: absolute;
+      left: 0;
+      bottom: -10px;
+      border-radius: 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f1f1f1;
+      font-weight: 600;
+    }
+
+    button.issue-btn {
+      padding: 6px 12px;
+      background: #00b894;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 2px;
+    }
+
+    button.issue-btn:hover {
+      background: #019875;
+    }
+
+    button.delete-btn {
+      padding: 6px 12px;
+      background: #d63031;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 2px;
+    }
+
+    button.delete-btn:hover {
+      background: #c0392b;
+    }
+
+    form label {
+      font-weight: 600;
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    form input[type="text"],
+    form input[type="date"],
+    form input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0984e3;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background-color: #0652dd;
+    }
+
+    @media (max-width: 1000px) {
+      .main-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-wrapper">
+
+    <!-- Student Request Table -->
+    <div class="left-panel">
+      <h2>📚 Student Requests</h2>
+      <table>
+        <thead>
+          <tr id="request-<?= $request['id'] ?>">
+            <th>Title</th>
+            <th>Author</th>
+            <th>Student ID</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="requestBody">
+          <!-- Filled via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Issue Form -->
+    <div class="right-panel">
+      <h2>📘 Issue a Book</h2>
+      <form id="issueForm">
+
+        <label for="student_id">Student ID</label>
+        <input type="text" name="student_id" id="student_id" required>
+
+        <label for="book_id">Book ID</label>
+        <input type="number" name="book_id" id="book_id" required>
+
+        <label for="book_title">Book Title</label>
+        <input type="text" name="book_title" id="book_title" required>
+
+        <label for="author">Author</label>
+        <input type="text" name="author" id="author" required>
+
+        <label for="issue_date">Issue Date</label>
+        <input type="date" name="issue_date" id="issue_date" required>
+
+        <label for="due_date">Due Date</label>
+        <input type="date" name="due_date" id="due_date" required>
+
+        <button type="submit">📤 Issue Book</button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- JavaScript Section -->
+  <script>
+
+
+    function fillForm(studentId, title, author, bookId) {
+      document.getElementById('student_id').value = studentId;
+      document.getElementById('book_title').value = title;
+      document.getElementById('author').value = author;
+      document.getElementById('book_id').value = bookId;
+    }
+
+    function deleteRequest(requestId, row) {
+      if (confirm("Are you sure you want to delete this request?")) {
+        fetch("delete_request2.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "id=" + encodeURIComponent(requestId)
+        })
+          .then(response => response.text())
+          .then(data => {
+            console.log("Server response:", data); // for debugging
+
+            if (data.trim() === "deleted") {
+              row.remove(); // Remove the deleted row from table
+              alert("Request deleted successfully.");
+            } else {
+              alert("Delete failed: " + data);
+            }
+          })
+          .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred.");
+          });
+      }
+    }
+
+    // Load pending requests
+    fetch("fetch_pending_requests2.php")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("requestBody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='6'>No pending requests</td></tr>";
+          return;
+        }
+
+        data.forEach(req => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+           <td>${req.title}</td>
+           <td>${req.author}</td>
+           <td>${req.student_id}</td>
+           <td>${req.status}</td>
+           <td>${req.request_date || ""}</td>
+           <td>
+           <button type="button" class="issue-btn"
+             onclick="fillForm('${req.student_id}', \`${req.title}\`, \`${req.author}\`, ${req.book_id})">
+             Issue
+           </button>
+           <button type="button" class="delete-btn"
+             onclick="deleteRequest(${req.id})">
+              Delete
+           </button>
+           </td>
+         `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(err => {
+        document.getElementById("requestBody").innerHTML =
+          "<tr><td colspan='6'>❌ Error loading requests</td></tr>";
+        console.error("Fetch error:", err);
+      });
+
+    // AJAX form submit
+    document.getElementById("issueForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+
+      fetch("issue-book2.php", {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.text())
+        .then(response => {
+          if (response.trim() === "success") {
+            alert("✅ Book Issued Successfully!");
+            document.getElementById("issueForm").reset();
+            fetchRequests(); // reload the requests list
+          } else if (response.trim() === "not_available") {
+            alert("❌ Book not available.");
+          } else {
+            alert("⚠️ Something went wrong: " + response);
+          }
+        })
+
+    });
+  </script>
+
+</body>
+
+</html>

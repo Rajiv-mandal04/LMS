@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Issued Books</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background-color: #f2f6fc; min-height: 100vh; padding: 2rem; color: #2c3e50; }
+    h1 { text-align: center; font-size: 2.2rem; margin-bottom: 2rem; color: #1e3a5f; }
+    .book-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+    .book-card {
+      background-color: #ffffff;
+      border: 1px solid #dce3ed;
+      border-left: 5px solid #1e88e5;
+      border-radius: 8px;
+      padding: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: box-shadow 0.3s ease;
+    }
+    .book-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    .book-id { font-size: 0.85rem; color: #6c757d; margin-bottom: 4px; }
+    .book-title { font-size: 1.1rem; font-weight: 600; color: #1e3a5f; margin-bottom: 5px; }
+    .book-author { font-size: 0.95rem; color: #555; margin-bottom: 8px; }
+    .book-dates { font-size: 0.88rem; color: #333; }
+    @media (max-width: 500px) { h1 { font-size: 1.5rem; } }
+  </style>
+</head>
+<body>
+  <h1>📚 My Issued Books</h1>
+  <div class="book-container" id="bookList"></div>
+
+  <script>
+    fetch('My-issue-book.php')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('bookList');
+        container.innerHTML = '';
+
+        data.forEach(book => {
+          const card = document.createElement('div');
+          card.className = 'book-card';
+          card.innerHTML = `
+            <div class="book-id">Book ID: ${book.book_id}</div>
+            <div class="book-title">${book.title}</div>
+            <div class="book-author">Author: ${book.author}</div>
+            <div class="book-dates">📅 Issued: ${book.issue_date}</div>
+            <div class="book-dates">⏳ Due: ${book.due_date}</div>
+          `;
+          container.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>

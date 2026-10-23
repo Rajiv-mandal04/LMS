@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📖 Search Books</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 30px 20px;
+      background: linear-gradient(to right, #f1f2b5, #135058);
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: white;
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    .search-box {
+      max-width: 400px;
+      margin: 0 auto 30px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: none;
+      font-size: 1rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .book-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .author {
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .category {
+      font-size: 0.9rem;
+      background: #e3f2fd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .stock {
+      font-weight: bold;
+      color: #0984e3;
+    }
+
+    .no-results {
+      text-align: center;
+      color: white;
+      font-size: 1.2rem;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 500px) {
+      .title {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📚 Search Books in Library</h2>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 Search by Title or Book ID...">
+  </div>
+
+  <div class="book-list" id="bookList">Loading books...</div>
+
+  <script>
+    let books = [];
+
+    fetch("get_all_books4.php")
+      .then(res => res.json())
+      .then(data => {
+        books = data;
+        displayBooks(books);
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById("bookList").innerHTML = "<div class='no-results'>❌ Error loading books.</div>";
+      });
+
+    function displayBooks(bookArray) {
+      const list = document.getElementById("bookList");
+      list.innerHTML = "";
+
+      if (bookArray.length === 0) {
+        list.innerHTML = "<div class='no-results'>❌ No books found.</div>";
+        return;
+      }
+
+      bookArray.forEach(book => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="title">📖 ${book.title}</div>
+          <div class="author">👨‍💼 ${book.author}</div>
+          <div class="category">🗂️ ${book.category}</div>
+          <div class="stock">📦 In Stock: ${book.quantity}</div>
+          <div style="font-size: 0.85rem; color: #999;">ID: ${book.id}</div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+
+      const filtered = books.filter(book =>
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.id.toString().includes(searchTerm)
+      );
+
+      displayBooks(filtered);
+    });
+  </script>
+
+</body>
+</html>

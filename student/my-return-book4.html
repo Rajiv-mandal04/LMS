@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Return Book</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        background: #f0f4f8;
+        color: #333;
+    }
+    header {
+        background: linear-gradient(90deg, #0077b6, #00b4d8);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    }
+    main {
+        max-width: 500px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+    }
+    .input-row {
+        display: flex;
+        gap: 10px;
+    }
+    input[type="number"] {
+        flex: 2;
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+    }
+    input[type="number"]:focus {
+        border-color: #00b4d8;
+        box-shadow: 0 0 5px rgba(0,180,216,0.4);
+    }
+    button {
+        flex: 1;
+        padding: 10px;
+        background: #0077b6;
+        color: white;
+        border: none;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: #023e8a;
+    }
+    .details {
+        margin-top: 20px;
+        display: none;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    #fine_text {
+        color: #d90429;
+        font-weight: bold;
+    }
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    .popup-content {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    }
+    .popup-content h3 {
+        margin-top: 0;
+        color: #d90429;
+    }
+    .popup-content input {
+        width: 90%;
+        margin-top: 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+    .popup-content button {
+        margin-top: 12px;
+        width: 100%;
+    }
+    .btn-cancel {
+        background: #adb5bd;
+    }
+    .btn-cancel:hover {
+        background: #6c757d;
+    }
+</style>
+</head>
+<body>
+<header>📚 Return Book</header>
+
+<main>
+    <div class="input-row">
+        <input type="number" id="book_id" placeholder="Enter Book ID">
+        <button onclick="fetchDetails()">Search</button>
+    </div>
+
+    <div class="details" id="details">
+        <p><b>Title:</b> <span id="title"></span></p>
+        <p><b>Author:</b> <span id="author"></span></p>
+        <p><b>Issue Date:</b> <span id="issue_date"></span></p>
+        <p><b>Due Date:</b> <span id="due_date"></span></p>
+        <p id="fine_text"></p>
+        <button onclick="submitReturn()">Return Book</button>
+    </div>
+</main>
+
+<!-- Fine Popup -->
+<div class="popup" id="finePopup">
+    <div class="popup-content">
+        <h3>Fine Payment</h3>
+        <p>You have a fine of Rs. <span id="fine_amount"></span></p>
+        <input type="number" id="fine_input" placeholder="Enter fine amount">
+        <button onclick="payFine()">Pay & Return</button>
+        <button class="btn-cancel" onclick="closePopup()">Cancel</button>
+    </div>
+</div>
+
+<script>
+let currentBookId = null;
+let fine = 0;
+
+function fetchDetails() {
+    const book_id = document.getElementById('book_id').value;
+    if (!book_id) { alert("Enter Book ID"); return; }
+
+    fetch(`fetch-book-details.php?book_id=${book_id}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('details').style.display = 'block';
+        document.getElementById('title').innerText = data.book_title;
+        document.getElementById('author').innerText = data.author;
+        document.getElementById('issue_date').innerText = data.issue_date;
+        document.getElementById('due_date').innerText = data.due_date;
+        currentBookId = data.book_id;
+        fine = data.fine;
+        document.getElementById('fine_text').innerText = fine > 0 ? `Fine: Rs. ${fine}` : '';
+    });
+}
+
+function submitReturn() {
+    if (fine > 0) {
+        document.getElementById('fine_amount').innerText = fine;
+        document.getElementById('finePopup').style.display = 'block';
+    } else {
+        completeReturn();
+    }
+}
+
+function payFine() {
+    const enteredFine = document.getElementById('fine_input').value;
+    if (!enteredFine || parseInt(enteredFine) !== fine) {
+        alert(`Please enter the correct fine amount: Rs. ${fine}`);
+        return;
+    }
+    completeReturn();
+    closePopup();
+}
+
+function closePopup() {
+    document.getElementById('finePopup').style.display = 'none';
+}
+
+function completeReturn() {
+    fetch('my-return-book4.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `book_id=${currentBookId}`
+    })
+    .then(res => res.text())
+    .then(msg => {
+        alert(msg);
+        location.reload();
+    });
+}
+</script>
+</body>
+</html>

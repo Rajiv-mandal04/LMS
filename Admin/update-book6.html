@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Book - Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 80px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .form-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #007bff;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <div class="form-title">📚 Update Book Details</div>
+    <form id="updateForm">
+      <div class="mb-3">
+        <label for="bookId" class="form-label">Enter Book ID</label>
+        <input type="number" id="bookId" name="id" class="form-control" required />
+      </div>
+      <div id="bookDetails" style="display:none;">
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" id="title" name="title" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="author" class="form-label">Author</label>
+          <input type="text" id="author" name="author" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="category" class="form-label">Category</label>
+          <input type="text" id="category" name="category" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="quantity" class="form-label">Quantity (Not Editable)</label>
+          <input type="number" id="quantity" name="quantity" class="form-control" readonly />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Update Book</button>
+      </div>
+    </form>
+    <div id="response-msg" class="mt-3"></div>
+  </div>
+
+  <script>
+    document.getElementById("bookId").addEventListener("blur", function () {
+      const id = this.value;
+      if (!id) return;
+      fetch("fetch-book6.php?id=" + id)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            document.getElementById("bookDetails").style.display = "block";
+            document.getElementById("title").value = data.book.title;
+            document.getElementById("author").value = data.book.author;
+            document.getElementById("category").value = data.book.category;
+            document.getElementById("quantity").value = data.book.quantity;
+          } else {
+            alert(data.message);
+          }
+        });
+    });
+
+    document.getElementById("updateForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch("update-book6.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const msgBox = document.getElementById("response-msg");
+          msgBox.innerHTML = `<div class="alert alert-${data.success ? "success" : "danger"}">${data.message}</div>`;
+        });
+    });
+  </script>
+</body>
+</html>

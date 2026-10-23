@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📘 View Students (Issued Books)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #bbdefb);
+      margin: 0;
+      padding: 40px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      max-width: 400px;
+      margin: 0 auto 30px;
+      display: flex;
+      justify-content: center;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #90caf9;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #1976d2;
+    }
+
+    .card {
+      background: #ffffff;
+      border-left: 6px solid #42a5f5;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 15px auto;
+      max-width: 600px;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #0d47a1;
+    }
+
+    .no-data {
+      text-align: center;
+      color: red;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📘 Students</h2>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 Search by Student ID...">
+  </div>
+
+  <div id="studentList">Loading...</div>
+
+  <script>
+    let allStudents = [];
+
+    fetch("view-students5.php")
+      .then(res => res.json())
+      .then(data => {
+        allStudents = data;
+        renderStudents(data);
+      })
+      .catch(err => {
+        document.getElementById("studentList").innerHTML = '<div class="no-data">❌ Error loading data.</div>';
+        console.error(err);
+      });
+
+    function renderStudents(data) {
+      const container = document.getElementById("studentList");
+      container.innerHTML = '';
+
+      if (data.length === 0) {
+        container.innerHTML = '<div class="no-data">No issued book data found.</div>';
+        return;
+      }
+
+      data.forEach(student => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          👤 <span class="highlight">Student ID:</span> ${student.student_id}<br>
+          📚 <span class="highlight">Total Books:</span> ${student.total_books}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.trim();
+      const filtered = allStudents.filter(student =>
+        student.student_id.includes(query)
+      );
+      renderStudents(filtered);
+    });
+  </script>
+
+</body>
+</html>

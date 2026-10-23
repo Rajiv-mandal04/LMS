@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Request a Book</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .request-card {
+      background-color: #fff;
+      padding: 40px 35px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+
+    .request-card h2 {
+      font-size: 24px;
+      margin-bottom: 25px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .request-card input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .request-card input:focus {
+      outline: none;
+      border-color: #3a8fff;
+      box-shadow: 0 0 5px rgba(58, 143, 255, 0.4);
+    }
+
+    .request-card button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+    }
+
+    .request-card button:hover {
+      background-color: #0056cc;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+
+  <div class="request-card">
+    <h2>📚 Request a Book</h2>
+    <form id="requestForm">
+      <input type="text" id="title" placeholder="Book Title" required />
+      <input type="text" id="author" placeholder="Author" required />
+      <input type="text" id="student_id" placeholder="Your Student ID" required />
+      <button type="submit">Request Book</button>
+    </form>
+    <div class="message" id="messageBox"></div>
+  </div>
+
+  <script>
+    document.getElementById("requestForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("title").value.trim();
+      const author = document.getElementById("author").value.trim();
+      const student_id = document.getElementById("student_id").value.trim();
+      const messageBox = document.getElementById("messageBox");
+
+      if (!title || !author || !student_id) {
+        messageBox.textContent = "❌ Please fill in all fields.";
+        messageBox.className = "message error";
+        return;
+      }
+
+      fetch("request-book5.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, author, student_id })
+      })
+      .then(res => res.text())
+      .then(response => {
+        if (response.includes("✅")) {
+          messageBox.className = "message success";
+        } else {
+          messageBox.className = "message error";
+        }
+        messageBox.textContent = response;
+      })
+      .catch(err => {
+        messageBox.className = "message error";
+        messageBox.textContent = "❌ Server error.";
+      });
+    });
+  </script>
+
+</body>
+</html>

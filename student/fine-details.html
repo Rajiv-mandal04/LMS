@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📕 Fine Details</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 30px;
+      background-color: #f9fafb;
+    }
+    h2 {
+      text-align: center;
+      color: #1e3a8a;
+      margin-bottom: 25px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 14px 18px;
+      text-align: left;
+    }
+    th {
+      background-color: #1e40af;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f1f5f9;
+    }
+    .fine {
+      color: red;
+      font-weight: bold;
+    }
+    .no-fine {
+      color: green;
+      font-weight: 600;
+    }
+    .highlight {
+      background-color: #ffe4e6;
+      color: #b91c1c;
+      font-weight: bold;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📕 Fine Details</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Book ID</th>
+      <th>Book</th>
+      <th>Author</th>
+      <th>Due Date</th>
+      <th>Per Day Fine</th>
+      <th>Total Fine</th>
+    </tr>
+  </thead>
+  <tbody id="fineTable">Loading...</tbody>
+</table>
+
+<script>
+const perDayFine = 5;
+
+fetch("fine-details.php")
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById("fineTable");
+    table.innerHTML = "";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    data.forEach(book => {
+      const dueDate = new Date(book.due_date);
+      dueDate.setHours(0, 0, 0, 0);
+      const overdueDays = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+      const totalFine = overdueDays > 0 ? overdueDays * perDayFine : 0;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${book.book_id}</td>
+        <td>${book.book_title}</td>
+        <td>${book.author}</td>
+        <td>${book.due_date}</td>
+        <td><span class="highlight">₹${perDayFine}</span></td>
+        <td>
+          ${
+            overdueDays > 0
+              ? `<span class="highlight">🔴 ₹${totalFine} (${overdueDays} days late)</span>`
+              : `<span class="no-fine">No Fine</span>`
+          }
+        </td>
+      `;
+      table.appendChild(row);
+    });
+
+    if (data.length === 0) {
+      table.innerHTML = `<tr><td colspan="6">No issued books found.</td></tr>`;
+    }
+  })
+  .catch(err => {
+    document.getElementById("fineTable").innerHTML = `<tr><td colspan="6">Error fetching data.</td></tr>`;
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>

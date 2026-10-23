@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📅 Due Date Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background-color: #1e3a8a;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:hover {
+      background-color: #f1f5f9;
+    }
+    .overdue {
+      color: #dc2626;
+      font-weight: bold;
+    }
+    .left {
+      color: #059669;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      td {
+        position: relative;
+        padding-left: 50%;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        top: 14px;
+        font-weight: bold;
+        color: #374151;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2>📅 Due Date Tracker</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Book ID</th>
+      <th>Book</th>
+      <th>Author</th>
+      <th>Issue Date</th>
+      <th>Due Date</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="trackerTable">Loading...</tbody>
+</table>
+
+<script>
+fetch("get_issued_books.php")
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById("trackerTable");
+    table.innerHTML = "";
+    const today = new Date();
+
+    data.forEach(book => {
+      const due = new Date(book.due_date);
+      const status = today > due
+        ? '<span class="overdue">❗ Overdue</span>'
+        : `<span class="left">${Math.ceil((due - today) / (1000 * 60 * 60 * 24))} days left</span>`;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td data-label="Book ID">${book.book_id}</td>
+        <td data-label="Book">${book.book_title}</td>
+        <td data-label="Author">${book.author}</td>
+        <td data-label="Issue Date">${book.issue_date}</td>
+        <td data-label="Due Date">${book.due_date}</td>
+        <td data-label="Status">${status}</td>
+      `;
+      table.appendChild(row);
+    });
+
+    if (data.length === 0) {
+      table.innerHTML = `<tr><td colspan="6">No issued books yet.</td></tr>`;
+    }
+  })
+  .catch(err => {
+    document.getElementById("trackerTable").innerHTML = `<tr><td colspan="6">Error loading books.</td></tr>`;
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>

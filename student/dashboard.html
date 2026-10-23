@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0077cc;
+            color: white;
+            padding: 15px 30px;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+        }
+
+        .center-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #ff4c4c;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #e04343;
+        }
+
+
+        main {
+            width: 1100px;
+            margin: 150px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .welcome-msg {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-top: 40px;
+            margin-bottom: -100px;
+            color: #333;
+        }
+
+
+        .box {
+            height: 170px;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .box:nth-child(1) {
+            background-color: #f39c12;
+        }
+
+        .box:nth-child(2) {
+            background-color: #27ae60;
+        }
+
+        .box:nth-child(3) {
+            background-color: #e74c3c;
+        }
+
+        .box:nth-child(4) {
+            background-color: #9b59b6;
+        }
+
+        .box:nth-child(5) {
+            background-color: #3498db;
+        }
+
+        .box:nth-child(6) {
+            background-color: #16a085;
+        }
+
+        footer {
+            background-color: #12507d;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="LMS Logo">
+            LMS
+        </div>
+        <div class="center-text">Student Dashboard</div>
+        <button class="logout-btn">Logout</button>
+    </header>
+
+    <div class="welcome-msg">Welcome Dear Student,</div>
+
+    <main>
+
+        <a href="My-issue-book.html" class="box">My Issue Book</a>
+        <a href="due-date-tracker.html" class="box">My Due Date Tracker</a>
+        <a href="fine-details.html" class="box">My Fine Status</a>
+        <a href="search-book1.html" class="box">My Search Book</a>
+        <a href="request-book5.html" class="box">My Request Book</a>
+        <a href="my-return-book4.html" class="box">My Return Book</a>
+    </main>
+
+    <footer>
+        2025 Library Management System. [Rjv] © All rights reserved.
+    </footer>
+
+</body>
+<script>
+    const logout = document.querySelector(".logout-btn");
+
+    logout.addEventListener('click', function () {
+        alert("Logout successfully");
+    });
+
+
+</script>
+
+</html>

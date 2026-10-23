@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📘 Return Book Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      background-color: #f1f5f9;
+    }
+
+    h2 {
+      color: #2d3436;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .overdue {
+      border-left: 5px solid red;
+    }
+
+    .returned {
+      border-left: 5px solid green;
+    }
+
+    .fine {
+      color: red;
+      font-weight: bold;
+    }
+
+    .status {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📘 Return Book Panel</h2>
+<div id="returnList">Loading...</div>
+
+<script>
+fetch("return-book3.php")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("returnList");
+    container.innerHTML = "";
+    const today = new Date();
+
+    data.forEach(book => {
+      const due = new Date(book.due_date);
+      const returned = book.return_date && book.return_date !== "0000-00-00";
+
+      const issue = new Date(book.issue_date);
+      const maxDue = new Date(issue);
+      maxDue.setDate(issue.getDate() + 30); // 1 month validity
+
+      let card = document.createElement("div");
+      card.className = "card";
+
+      let statusHTML = "";
+
+      if (returned) {
+        card.classList.add("returned");
+        statusHTML = `<div class="status" style="color:green;">✔️ Returned on ${book.return_date}</div>`;
+      } else if (today > due) {
+        const overdueDays = Math.floor((today - due) / (1000 * 60 * 60 * 24));
+        const fine = overdueDays * 5;
+        card.classList.add("overdue");
+        statusHTML = `<div class="fine">❗ Overdue by ${overdueDays} days | Fine: ₹${fine}</div>`;
+      } else {
+        const daysLeft = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+        statusHTML = `<div style="color:green;" class="status">⏳ ${daysLeft} days left</div>`;
+      }
+
+      card.innerHTML = `
+        <strong>📖 Book:</strong> ${book.book_title} by ${book.author}<br>
+        <strong>👤 Student ID:</strong> ${book.student_id}<br>
+        <strong>📅 Issue Date:</strong> ${book.issue_date}<br>
+        <strong>📆 Due Date:</strong> ${book.due_date}<br>
+        ${statusHTML}
+      `;
+      container.appendChild(card);
+    });
+
+    if (data.length === 0) {
+      container.innerHTML = "No issued books found.";
+    }
+  })
+  .catch(err => {
+    document.getElementById("returnList").innerText = "Error loading data.";
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>

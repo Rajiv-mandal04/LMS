@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>📚 Search Book</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #e3e8ed;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border: 1px solid #767575;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #0077cc;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .highlight {
+      background-color: #ffeaa7;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>📚 Search Book</h1>
+  <input type="text" id="searchInput" placeholder="🔍 Search by Book ID or Title...">
+
+  <table id="bookTable">
+    <thead>
+      <tr>
+        <th>Book ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Category</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="5">Loading...</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    let books = [];
+
+    fetch("get_books1.php")
+      .then(res => res.json())
+      .then(data => {
+        books = data;
+        displayBooks(books);
+      })
+      .catch(err => {
+        document.querySelector("#bookTable tbody").innerHTML = "<tr><td colspan='5'>❌ Error loading books</td></tr>";
+        console.error(err);
+      });
+
+    function displayBooks(bookList) {
+      const tbody = document.querySelector("#bookTable tbody");
+      tbody.innerHTML = "";
+
+      if (bookList.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>❌ Book not available in stock.</td></tr>";
+        return;
+      }
+
+      bookList.forEach(book => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${book.id}</td>
+        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.category}</td>
+        <td class="${book.quantity <= 0 ? 'low-stock' : ''}">
+          ${book.quantity <= 0 ? "❌ Out of Stock" : book.quantity}
+        </td>
+      `;
+        tbody.appendChild(row);
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+
+      const filtered = books.filter(book =>
+        book.title.toLowerCase().includes(query) || String(book.id).includes(query)
+      );
+
+      // Always show 'not available' message if no result
+      if (filtered.length === 0) {
+        displayBooks([]);
+      } else {
+        displayBooks(filtered);
+      }
+    });
+  </script>
+
+
+</body>
+
+</html>
