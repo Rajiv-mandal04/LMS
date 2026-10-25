@@ -9,7 +9,7 @@ function requireRole($role) {
     $userRole = $_SESSION[$role . "_role"] ?? null;
 
     if (!$userId || $userRole !== $role) {
-        header("Location: /LMS/login/index.html");
+        header("Location: /login/index.html");
         exit;
     }
 
