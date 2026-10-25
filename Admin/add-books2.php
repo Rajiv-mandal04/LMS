@@ -1,7 +1,13 @@
+
+<?php
+require_once __DIR__ . '/../auth.php';
+requireRole('admin');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add New Book</title>
   <style>
     * {
@@ -49,7 +55,6 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
-      transition: border-color 0.3s;
     }
 
     input:focus {
@@ -68,33 +73,40 @@
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
     button:hover {
       background-color: #005fa3;
     }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #0077cc;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
-
   <form action="add-books1.php" method="POST">
     <h2>📚 Add New Book</h2>
 
     <label for="title">Book Title</label>
-    <input type="text" id="title" name="title" required>
+    <input type="text" id="title" name="title" maxlength="255" required>
 
     <label for="author">Author</label>
-    <input type="text" id="author" name="author" required>
+    <input type="text" id="author" name="author" maxlength="255" required>
 
     <label for="category">Category</label>
-    <input type="text" id="category" name="category" required>
+    <input type="text" id="category" name="category" maxlength="150" required>
 
     <label for="quantity">Quantity</label>
-    <input type="number" id="quantity" name="quantity" required>
+    <input type="number" id="quantity" name="quantity" min="0" required>
 
     <button type="submit">➕ Add Book</button>
+    <a class="back" href="dashboard.php">← Back to Dashboard</a>
   </form>
-
 </body>
 </html>
+

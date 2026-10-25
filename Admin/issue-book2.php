@@ -1,44 +1,58 @@
-<?php
-$conn = new mysqli("127.0.0.1", "root", "", "library_db", 3309);
-if ($conn->connect_error) {
-    echo "error";
-    exit;
-}
 
-$student_id = $conn->real_escape_string($_POST['student_id']);
-$book_id = intval($_POST['book_id']);
-$book_title = $conn->real_escape_string($_POST['book_title']);
-$author = $conn->real_escape_string($_POST['author']);
-$issue_date = $conn->real_escape_string($_POST['issue_date']);
-$due_date = $conn->real_escape_string($_POST['due_date']);
+<?php
+require_once __DIR__ . '/../login/db.php';
+
+$student_id = $_POST['student_id'] ?? '';
+$book_id = intval($_POST['book_id'] ?? 0);
+$book_title = $_POST['book_title'] ?? '';
+$author = $_POST['author'] ?? '';
+$issue_date = $_POST['issue_date'] ?? '';
+$due_date = $_POST['due_date'] ?? '';
 
 if (!$book_id || !$student_id || !$book_title || !$author || !$issue_date || !$due_date) {
     echo "missing_data";
     exit;
 }
 
-$checkSql = "SELECT quantity FROM add_books1 WHERE id = $book_id";
-$checkResult = $conn->query($checkSql);
+try {
+    $checkStmt = $conn->prepare("SELECT quantity FROM add_books1 WHERE id = ?");
+    $checkStmt->execute([$book_id]);
+    $row = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
-if ($checkResult && $checkResult->num_rows > 0) {
-    $row = $checkResult->fetch_assoc();
+    if ($row) {
+        if ((int)$row['quantity'] > 0) {
+            $insertStmt = $conn->prepare(
+                "INSERT INTO issued_books
+                (student_id, book_title, author, issue_date, due_date, book_id)
+                VALUES (?, ?, ?, ?, ?, ?)"
+            );
 
-    if ((int)$row['quantity'] > 0) {
-        $insertSql = "INSERT INTO issued_books (student_id, book_title, author, issue_date, due_date, book_id)
-                      VALUES ('$student_id', '$book_title', '$author', '$issue_date', '$due_date', $book_id)";
-        if ($conn->query($insertSql)) {
-            $conn->query("UPDATE add_books1 SET quantity = quantity - 1 WHERE id = $book_id");
-            $conn->query("DELETE FROM book_requests WHERE student_id = '$student_id' AND title = '$book_title'");
-            echo "success";
+            if ($insertStmt->execute([
+                $student_id, $book_title, $author,
+                $issue_date, $due_date, $book_id
+            ])) {
+                $updateStmt = $conn->prepare(
+                    "UPDATE add_books1 SET quantity = quantity - 1 WHERE id = ?"
+                );
+                $updateStmt->execute([$book_id]);
+
+                $deleteStmt = $conn->prepare(
+                    "DELETE FROM book_requests WHERE student_id = ? AND title = ?"
+                );
+                $deleteStmt->execute([$student_id, $book_title]);
+
+                echo "success";
+            } else {
+                echo "insert_failed";
+            }
         } else {
-            echo "insert_failed";
+            echo "not_available";
         }
     } else {
-        echo "not_available";
+        echo "book_not_found";
     }
-} else {
-    echo "book_not_found";
+} catch (PDOException $e) {
+    error_log("Issue book error: " . $e->getMessage());
+    echo "error";
 }
-
-$conn->close();
 ?>

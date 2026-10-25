@@ -1,31 +1,69 @@
+
 <?php
 session_start();
-$conn = new mysqli("127.0.0.1", "root", "", "library_db", 3309);
+require_once "db.php";
 
-$email = $_POST['email'];
-$password = $_POST['password'];
-$role = $_POST['role'];
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: index.html");
+    exit;
+}
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email=? AND role=?");
-$stmt->bind_param("ss", $email, $role);
-$stmt->execute();
-$result = $stmt->get_result();
+$email = trim($_POST["email"] ?? "");
+$password = $_POST["password"] ?? "";
+$role = strtolower(trim($_POST["role"] ?? ""));
 
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
+if (
+    $email === "" ||
+    $password === "" ||
+    !in_array($role, ["admin", "student"], true)
+) {
+    echo "<script>
+        alert('Please enter valid login details.');
+        window.location.href='index.html';
+    </script>";
+    exit;
+}
 
-    if (password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
+try {
+    // Find user by email first
+    $stmt = $conn->prepare(
+        "SELECT id, name, email, password, role
+         FROM users
+         WHERE LOWER(email) = LOWER(:email)
+         LIMIT 1"
+    );
 
-        if ($role === 'admin') {
-            header("Location: ../admin/dashboard.html");
+    $stmt->execute([":email" => $email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check user, password and selected role
+    if (
+        $user &&
+        password_verify($password, $user["password"]) &&
+        strtolower($user["role"]) === $role
+    ) {
+        session_regenerate_id(true);
+
+        $_SESSION[$role . "_user_id"] = $user["id"];
+        $_SESSION[$role . "_user_name"] = $user["name"];
+        $_SESSION[$role . "_role"] = $role;
+
+        if ($role === "admin") {
+            header("Location: ../Admin/dashboard.php");
         } else {
-            header("Location: ../student/dashboard.html");
+            header("Location: ../student/dashboard.php");
         }
         exit;
     }
-}
 
-echo "<script>alert('Invalid login'); window.location.href='index.html';</script>";
-?>
+    echo "<script>
+        alert('Invalid email, password, or selected role.');
+        window.location.href='index.html';
+    </script>";
+    exit;
+
+} catch (PDOException $e) {
+    error_log($e->getMessage());
+    http_response_code(500);
+    echo "Login failed. Please try again.";
+}

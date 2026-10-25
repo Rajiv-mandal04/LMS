@@ -1,20 +1,19 @@
+
 <?php
+require_once __DIR__ . '/../login/db.php';
+
 $id = $_GET['id'] ?? 0;
-
-$conn = new mysqli("127.0.0.1", "root", "", "library_db", 3309);
-
-if ($conn->connect_error) {
-    die("Connection failed");
-}
-
 $today = date('Y-m-d');
 
-$sql = "UPDATE issued_books SET return_date = '$today' WHERE id = $id";
-if ($conn->query($sql) === TRUE) {
+try {
+    $sql = "UPDATE issued_books SET return_date = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$today, $id]);
+
     echo "Return marked successfully.";
-} else {
+
+} catch (PDOException $e) {
+    error_log("Return update error: " . $e->getMessage());
     echo "Error updating record.";
 }
-
-$conn->close();
 ?>

@@ -1,21 +1,27 @@
+
 <?php
-$conn = new mysqli("127.0.0.1", "root", "", "library_db", 3309);
+require_once __DIR__ . '/../auth.php';
+requireRole('student');
+
+require_once __DIR__ . '/../login/db.php';
+
 $data = json_decode(file_get_contents("php://input"), true);
 
-$title = $data['title'] ?? '';
-$author = $data['author'] ?? '';
-$student_id = $data['student_id'] ?? '';
+$title = trim($data['title'] ?? '');
+$author = trim($data['author'] ?? '');
+$student_id = $_SESSION['user_id'];
 
-if (!empty($title) && !empty($author) && !empty($student_id)) {
-    $query = "INSERT INTO book_requests (title, author, student_id, status, request_date)
-              VALUES ('$title', '$author', '$student_id', 'pending', NOW())";
+if (!empty($title) && !empty($author)) {
+    $query = "INSERT INTO book_requests
+              (title, author, student_id, status, request_date)
+              VALUES (?, ?, ?, 'pending', NOW())";
 
-    if ($connect->query($query)) {
-        echo "✅ Book requested successfully!";
-    } else {
-        echo "❌ Error: " . $connect->error;
-    }
+    $stmt = $conn->prepare($query);
+    $stmt->execute([$title, $author, $student_id]);
+
+    echo "✅ Book requested successfully!";
 } else {
     echo "❌ Please fill in all fields.";
 }
 ?>
+

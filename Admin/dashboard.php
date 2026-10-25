@@ -1,10 +1,17 @@
+
+<?php
+require_once __DIR__ . '/../auth.php';
+requireRole('admin');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Dashboard</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/29/29302.png">
+
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +20,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #f5f5f5;
             display: flex;
             flex-direction: column;
@@ -28,6 +35,7 @@
             color: white;
             padding: 15px 30px;
             position: relative;
+            gap: 15px;
         }
 
         .logo {
@@ -53,41 +61,39 @@
         }
 
         .logout-btn {
+            display: inline-block;
             background-color: #ff4c4c;
-            border: none;
             color: white;
-            padding: 8px 16px;
+            padding: 9px 16px;
             font-size: 1rem;
             border-radius: 5px;
-            cursor: pointer;
+            text-decoration: none;
             transition: background-color 0.3s ease;
+            white-space: nowrap;
         }
 
         .logout-btn:hover {
             background-color: #e04343;
         }
 
-
-        main {
-            width: 1100px;
-            margin: 150px auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-
         .welcome-msg {
             text-align: center;
             font-size: 1.6rem;
             font-weight: 500;
-            margin-top: 40px;
-            margin-bottom: -100px;
+            margin: 35px 15px 0;
             color: #333;
         }
 
+        main {
+            width: min(1100px, 92%);
+            margin: 45px auto;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 25px;
+        }
 
         .box {
-            height: 170px;
+            min-height: 170px;
             border-radius: 12px;
             color: white;
             font-size: 1.2rem;
@@ -95,16 +101,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
             text-decoration: none;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease, box-shadow 0.3s ease;
             padding: 20px;
-            cursor: pointer;
         }
 
         .box:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .box:focus-visible,
+        .logout-btn:focus-visible {
+            outline: 3px solid #222;
+            outline-offset: 4px;
         }
 
         .box:nth-child(1) {
@@ -116,15 +128,15 @@
         }
 
         .box:nth-child(3) {
-            background-color: #00cec9;
+            background-color: #00a8a8;
         }
 
         .box:nth-child(4) {
-            background-color: #fd79a8;
+            background-color: #e84393;
         }
 
         .box:nth-child(5) {
-            background-color: #fab005;
+            background-color: #d99400;
         }
 
         .box:nth-child(6) {
@@ -139,6 +151,43 @@
             font-size: 14px;
             margin-top: auto;
         }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 15px;
+                flex-wrap: wrap;
+            }
+
+            .center-text {
+                position: static;
+                transform: none;
+                order: 3;
+                width: 100%;
+                text-align: center;
+                font-size: 1.25rem;
+            }
+
+            main {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 15px;
+                margin: 30px auto;
+            }
+
+            .box {
+                min-height: 135px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-msg {
+                font-size: 1.3rem;
+            }
+        }
     </style>
 </head>
 
@@ -146,38 +195,34 @@
 
     <header>
         <div class="logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="LMS Logo">
-            LMS
+            <img
+                src="https://cdn-icons-png.flaticon.com/512/29/29302.png"
+                alt="LMS Logo">
+            <span>LMS</span>
         </div>
+
         <div class="center-text">Admin Dashboard</div>
-        <button class="logout-btn"><a href="../auth/logout.php">Logout</a></button>
+
+        <a href="../login/logout.php?role=admin" class="logout-btn">Logout</a>
     </header>
 
-    <div class="welcome-msg">Welcome Dear Admin,</div>
+    <div class="welcome-msg">
+        Welcome, Admin!
+    </div>
 
     <main>
-
-        <a href="add-books1.html" class="box">Add New Book</a>
-        <a href="issue-book2.html" class="box">Issue Book</a>
-        <a href="return-book3.html" class="box">Return Book</a>
-        <a href="search-book4.html" class="box">Search Book</a>
-        <a href="view-students5.html" class="box">View Student</a>
-        <a href="update-book6.html" class="box">Update Book</a>
+        <a href="add-books2.php" class="box">Add New Book</a>
+        <a href="issue-book3.php" class="box">Issue Book</a>
+        <a href="return-book4.php" class="box">Return Book</a>
+        <a href="search-book4.php" class="box">Search Book</a>
+        <a href="view-students6.php" class="box">View Students</a>
+        <a href="update-book7.php" class="box">Update Book</a>
     </main>
 
     <footer>
-        2025 Library Management System. [Rjv] © All rights reserved.
+        &copy; 2026 LMS. All rights reserved.
     </footer>
 
 </body>
-<script>
-    const logout = document.querySelector(".logout-btn");
-
-    logout.addEventListener('click', function () {
-        alert("Logout successfully");
-    });
-
-
-</script>
-
 </html>
+

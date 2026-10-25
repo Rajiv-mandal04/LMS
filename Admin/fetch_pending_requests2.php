@@ -1,12 +1,6 @@
+
 <?php
-// Create connection
-$conn = new mysqli("127.0.0.1", "root", "", "library_db", 3309);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
+require_once __DIR__ . '/../login/db.php';
 
 // Fetch only 'pending' requests
 $sql = "SELECT * FROM book_requests WHERE status = 'pending'";
@@ -14,14 +8,11 @@ $result = $conn->query($sql);
 
 $requests = [];
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $requests[] = $row;
-    }
+while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    $requests[] = $row;
 }
 
 header('Content-Type: application/json');
 echo json_encode($requests);
-
-$conn->close();
 ?>
+
