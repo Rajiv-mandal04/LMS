@@ -1,6 +1,4 @@
-
 <?php
-
 $host = "ep-solitary-forest-b51hlce9-pooler.c-7.us-east-2.aws.neon.tech";
 $port = "5432";
 $dbname = "library_db";

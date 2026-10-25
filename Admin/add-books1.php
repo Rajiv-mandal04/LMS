@@ -1,4 +1,3 @@
-
 <?php
 // DB Connection
 require_once __DIR__ . '/../login/db.php';

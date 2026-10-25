@@ -1,7 +1,5 @@
-
 <?php
 require_once __DIR__ . '/../login/db.php';
-
 // Fetch only 'pending' requests
 $sql = "SELECT * FROM book_requests WHERE status = 'pending'";
 $result = $conn->query($sql);
