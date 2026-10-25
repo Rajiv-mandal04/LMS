@@ -1,3 +1,2 @@
-
+DirectoryIndex login/index.html
 Options -Indexes
-DirectoryIndex index.php index.html
