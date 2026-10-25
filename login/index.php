@@ -49,11 +49,12 @@ try {
         $_SESSION[$role . "_role"] = $role;
 
         if ($role === "admin") {
-            header("Location: ../Admin/dashboard.php");
+         header("Location: /Admin/dashboard.php");
         } else {
-            header("Location: ../student/dashboard.php");
-        }
-        exit;
+         header("Location: /student/dashboard.php");
+       }
+exit;
+
     }
 
     echo "<script>
