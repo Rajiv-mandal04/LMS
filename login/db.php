@@ -4,12 +4,12 @@ $port = "5432";
 $dbname = "library_db";
 $user = "library_db_owner";
 
-// Read the complete Neon password from an environment variable
 $password = getenv("DB_PASSWORD");
 
 if ($password === false || $password === "") {
     error_log("DB_PASSWORD environment variable is missing.");
-    die("Database connection configuration is missing.");
+    http_response_code(500);
+    exit;
 }
 
 try {
@@ -22,10 +22,8 @@ try {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]
     );
-
 } catch (PDOException $e) {
     error_log($e->getMessage());
-    die("Database connection failed. Check connection settings.");
+    http_response_code(500);
+    exit;
 }
-?>
-
